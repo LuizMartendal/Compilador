@@ -44,7 +44,7 @@ public class Application {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
+		frame = new JFrame("Compilador");
 		frame.getContentPane().setMinimumSize(new Dimension(910, 600));
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
@@ -64,10 +64,51 @@ public class Application {
 		
 		JTextArea textAreaEditor = new JTextArea();
 		scrollPaneEditor.setViewportView(textAreaEditor);
+		textAreaEditor.setBorder(new NumberedBorder());
 		
 		JToolBar barraDeFerramentas = new JToolBar();
 		barraDeFerramentas.setPreferredSize(new Dimension(900, 70));
 		upPanel.add(barraDeFerramentas, BorderLayout.NORTH);
+		
+		JButton btnNew = new JButton("novo [crtl+n]");
+		btnNew.setFocusable(false);
+		btnNew.setMaximumSize(new Dimension(100, 60));
+		barraDeFerramentas.add(btnNew);
+		
+		JButton btnOpen = new JButton("abrir [crtl+o]");
+		btnOpen.setFocusable(false);
+		btnOpen.setMaximumSize(new Dimension(100, 60));
+		barraDeFerramentas.add(btnOpen);
+		
+		JButton btnSave = new JButton("salvar [crtl+s]");
+		btnSave.setFocusable(false);
+		btnSave.setMaximumSize(new Dimension(100, 60));
+		barraDeFerramentas.add(btnSave);
+		
+		JButton btnCopy = new JButton("copiar [crtl+c]");
+		btnCopy.setFocusable(false);
+		btnCopy.setMaximumSize(new Dimension(100, 60));
+		barraDeFerramentas.add(btnCopy);
+		
+		JButton btnPaste = new JButton("colar [crtl+v]");
+		btnPaste.setFocusable(false);
+		btnPaste.setMaximumSize(new Dimension(100, 60));
+		barraDeFerramentas.add(btnPaste);
+		
+		JButton btnCut = new JButton("recortar [crtl+x]");
+		btnCut.setFocusable(false);
+		btnCut.setMaximumSize(new Dimension(110, 60));
+		barraDeFerramentas.add(btnCut);
+		
+		JButton btnCompile = new JButton("compilar [F7]");
+		btnCompile.setFocusable(false);
+		btnCompile.setMaximumSize(new Dimension(100, 60));
+		barraDeFerramentas.add(btnCompile);
+		
+		JButton btnTeam = new JButton("equipe [F1]");
+		btnTeam.setFocusable(false);
+		btnTeam.setMaximumSize(new Dimension(100, 60));
+		barraDeFerramentas.add(btnTeam);
 		
 		JPanel downPanel = new JPanel();
 		splitPane.setRightComponent(downPanel);
