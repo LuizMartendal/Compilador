@@ -1,6 +1,7 @@
 package view;
 
 import java.awt.EventQueue;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -19,11 +20,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -100,6 +105,10 @@ public class Application {
 		});
 		btnNew.setFocusable(false);
 		btnNew.setMaximumSize(new Dimension(100, 60));
+		btnNew.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnNew.setHorizontalTextPosition(SwingConstants.CENTER);
+		ImageIcon icon = new ImageIcon(Application.class.getResource("/novo - recortar.png"));
+		btnNew.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnNew);
 		
 		JButton btnOpen = new JButton("abrir [crtl+o]");
@@ -110,6 +119,10 @@ public class Application {
 		});
 		btnOpen.setFocusable(false);
 		btnOpen.setMaximumSize(new Dimension(100, 60));
+		btnOpen.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnOpen.setHorizontalTextPosition(SwingConstants.CENTER);
+		icon = new ImageIcon(Application.class.getResource("/abrir.png"));
+		btnOpen.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnOpen);
 		
 		JButton btnSave = new JButton("salvar [crtl+s]");
@@ -120,6 +133,10 @@ public class Application {
 		});
 		btnSave.setFocusable(false);
 		btnSave.setMaximumSize(new Dimension(100, 60));
+		btnSave.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnSave.setHorizontalTextPosition(SwingConstants.CENTER);
+		icon = new ImageIcon(Application.class.getResource("/salvar.png"));
+		btnSave.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnSave);
 		
 		JButton btnCopy = new JButton("copiar [crtl+c]");
@@ -130,6 +147,10 @@ public class Application {
 		});
 		btnCopy.setFocusable(false);
 		btnCopy.setMaximumSize(new Dimension(100, 60));
+		btnCopy.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnCopy.setHorizontalTextPosition(SwingConstants.CENTER);
+		icon = new ImageIcon(Application.class.getResource("/copiar.png"));
+		btnCopy.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnCopy);
 		
 		JButton btnPaste = new JButton("colar [crtl+v]");
@@ -140,6 +161,10 @@ public class Application {
 		});
 		btnPaste.setFocusable(false);
 		btnPaste.setMaximumSize(new Dimension(100, 60));
+		btnPaste.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnPaste.setHorizontalTextPosition(SwingConstants.CENTER);
+		icon = new ImageIcon(Application.class.getResource("/colar.png"));
+		btnPaste.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnPaste);
 		
 		JButton btnCut = new JButton("recortar [crtl+x]");
@@ -150,6 +175,10 @@ public class Application {
 		});
 		btnCut.setFocusable(false);
 		btnCut.setMaximumSize(new Dimension(110, 60));
+		btnCut.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnCut.setHorizontalTextPosition(SwingConstants.CENTER);
+		icon = new ImageIcon(Application.class.getResource("/novo - recortar.png"));
+		btnCut.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnCut);
 		
 		JButton btnCompile = new JButton("compilar [F7]");
@@ -160,6 +189,10 @@ public class Application {
 		});
 		btnCompile.setFocusable(false);
 		btnCompile.setMaximumSize(new Dimension(100, 60));
+		btnCompile.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnCompile.setHorizontalTextPosition(SwingConstants.CENTER);
+		icon = new ImageIcon(Application.class.getResource("/compile.png"));
+		btnCompile.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnCompile);
 		
 		JButton btnTeam = new JButton("equipe [F1]");
@@ -170,6 +203,10 @@ public class Application {
 		});
 		btnTeam.setFocusable(false);
 		btnTeam.setMaximumSize(new Dimension(100, 60));
+		btnTeam.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnTeam.setHorizontalTextPosition(SwingConstants.CENTER);
+		icon = new ImageIcon(Application.class.getResource("/equipe.png"));
+		btnTeam.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnTeam);
 		
 		JPanel downPanel = new JPanel();
@@ -351,4 +388,13 @@ public class Application {
 	private void showTeam() {
 		textAreaMessages.setText("Integrantes: Augusto Juan Dalprá Arraga, Daniel Krüger e Luiz Henrique Martendal");
 	}
+	
+	private static Icon resizeIcon(Icon icon, int width, int height) {
+        if (icon instanceof ImageIcon) {
+            Image image = ((ImageIcon) icon).getImage();
+            Image resizedImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            return new ImageIcon(resizedImage);
+        }
+        return icon;
+    }
 }
