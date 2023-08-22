@@ -28,14 +28,17 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 
 public class Application {
 
@@ -308,6 +311,8 @@ public class Application {
 	
 	private void openNewFile() {
 		JFileChooser fileChooser = new JFileChooser();
+		FileNameExtensionFilter txtFilter = new FileNameExtensionFilter("Arquivos de Texto (.txt)", "txt");
+        fileChooser.setFileFilter(txtFilter);
         int result = fileChooser.showOpenDialog(frame);
 
         if (result == JFileChooser.APPROVE_OPTION) {
@@ -316,10 +321,9 @@ public class Application {
         	
         	try {
         		textAreaEditor.setText("");
-                List<String> lines = Files.readAllLines(Paths.get(file));
-                for (String line : lines) {
-                	textAreaEditor.append(line + "\n");
-                }
+                BufferedReader br = new BufferedReader(
+                		new InputStreamReader(new FileInputStream(file)));
+                textAreaEditor.read(br, br);
                 this.setFilePath(file);
             } catch (Exception e) {}
         }
