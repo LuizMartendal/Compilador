@@ -30,6 +30,11 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import lexico.Constants;
+import lexico.LexicalError;
+import lexico.Lexico;
+import lexico.Token;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -39,6 +44,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 public class Application {
 
@@ -46,6 +52,7 @@ public class Application {
 	private JTextArea textAreaMessages;
 	private JLabel lblStatus;
 	private JTextArea textAreaEditor;
+	private HashMap<Integer, String> dicionario = new HashMap<>();
 
 	/**
 	 * Launch the application.
@@ -67,7 +74,44 @@ public class Application {
 	 * Create the application.
 	 */
 	public Application() {
+		this.setHashMap();
 		initialize();
+	}
+
+	private void setHashMap() {
+		this.dicionario.put(Constants.t_constante_float, "constante float");
+		this.dicionario.put(Constants.t_constante_int, "constante int");
+		this.dicionario.put(Constants.t_constante_string, "constante string");
+		this.dicionario.put(Constants.t_do, "palavra reservada do");
+		this.dicionario.put(Constants.t_else, "palavra reservada else");
+		this.dicionario.put(Constants.t_false, "palavra reservada false");
+		this.dicionario.put(Constants.t_fun, "palavra reservada fun");
+		this.dicionario.put(Constants.t_identificador, "identificador");
+		this.dicionario.put(Constants.t_if, "palavra reservada if");
+		this.dicionario.put(Constants.t_in, "palavra reservada in");
+		this.dicionario.put(Constants.t_main, "palavra reservada main");
+		this.dicionario.put(Constants.t_out, "palavra reservada out");
+		this.dicionario.put(Constants.t_palavra_reservada, "palavra reservada");
+		this.dicionario.put(Constants.t_repeat, "palavra reservada repeat");
+		this.dicionario.put(Constants.t_TOKEN_18, "&");
+		this.dicionario.put(Constants.t_TOKEN_19, "|");
+		this.dicionario.put(Constants.t_TOKEN_20, "!");
+		this.dicionario.put(Constants.t_TOKEN_21, ",");
+		this.dicionario.put(Constants.t_TOKEN_22, ";");
+		this.dicionario.put(Constants.t_TOKEN_23, "=");
+		this.dicionario.put(Constants.t_TOKEN_24, ":");
+		this.dicionario.put(Constants.t_TOKEN_25, "(");
+		this.dicionario.put(Constants.t_TOKEN_26, ")");
+		this.dicionario.put(Constants.t_TOKEN_27, "{");
+		this.dicionario.put(Constants.t_TOKEN_28, "}");
+		this.dicionario.put(Constants.t_TOKEN_29, "==");
+		this.dicionario.put(Constants.t_TOKEN_30, "!=");
+		this.dicionario.put(Constants.t_TOKEN_31, "<");
+		this.dicionario.put(Constants.t_TOKEN_32, ">");
+		this.dicionario.put(Constants.t_TOKEN_33, "+");
+		this.dicionario.put(Constants.t_TOKEN_34, "-");
+		this.dicionario.put(Constants.t_TOKEN_35, "*");
+		this.dicionario.put(Constants.t_TOKEN_36, "/");
 	}
 
 	/**
@@ -77,29 +121,29 @@ public class Application {
 		frame = new JFrame("Compilador");
 		frame.getContentPane().setMinimumSize(new Dimension(910, 600));
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
-		
+
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setResizeWeight(0.75);
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		frame.getContentPane().add(splitPane, BorderLayout.CENTER);
-		
+
 		JPanel upPanel = new JPanel();
 		splitPane.setLeftComponent(upPanel);
 		upPanel.setLayout(new BorderLayout(0, 0));
-		
+
 		JScrollPane scrollPaneEditor = new JScrollPane();
 		upPanel.add(scrollPaneEditor, BorderLayout.CENTER);
 		scrollPaneEditor.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPaneEditor.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		
+
 		this.textAreaEditor = new JTextArea();
 		scrollPaneEditor.setViewportView(this.textAreaEditor);
 		this.textAreaEditor.setBorder(new NumberedBorder());
-		
+
 		JToolBar barraDeFerramentas = new JToolBar();
 		barraDeFerramentas.setPreferredSize(new Dimension(900, 70));
 		upPanel.add(barraDeFerramentas, BorderLayout.NORTH);
-		
+
 		JButton btnNew = new JButton("novo [crtl+n]");
 		btnNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -113,7 +157,7 @@ public class Application {
 		ImageIcon icon = new ImageIcon(Application.class.getResource("/novo - recortar.png"));
 		btnNew.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnNew);
-		
+
 		JButton btnOpen = new JButton("abrir [crtl+o]");
 		btnOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -127,7 +171,7 @@ public class Application {
 		icon = new ImageIcon(Application.class.getResource("/abrir.png"));
 		btnOpen.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnOpen);
-		
+
 		JButton btnSave = new JButton("salvar [crtl+s]");
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -141,7 +185,7 @@ public class Application {
 		icon = new ImageIcon(Application.class.getResource("/salvar.png"));
 		btnSave.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnSave);
-		
+
 		JButton btnCopy = new JButton("copiar [crtl+c]");
 		btnCopy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -155,7 +199,7 @@ public class Application {
 		icon = new ImageIcon(Application.class.getResource("/copiar.png"));
 		btnCopy.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnCopy);
-		
+
 		JButton btnPaste = new JButton("colar [crtl+v]");
 		btnPaste.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -169,7 +213,7 @@ public class Application {
 		icon = new ImageIcon(Application.class.getResource("/colar.png"));
 		btnPaste.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnPaste);
-		
+
 		JButton btnCut = new JButton("recortar [crtl+x]");
 		btnCut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -183,7 +227,7 @@ public class Application {
 		icon = new ImageIcon(Application.class.getResource("/novo - recortar.png"));
 		btnCut.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnCut);
-		
+
 		JButton btnCompile = new JButton("compilar [F7]");
 		btnCompile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -197,7 +241,7 @@ public class Application {
 		icon = new ImageIcon(Application.class.getResource("/compile.png"));
 		btnCompile.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnCompile);
-		
+
 		JButton btnTeam = new JButton("equipe [F1]");
 		btnTeam.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -211,27 +255,27 @@ public class Application {
 		icon = new ImageIcon(Application.class.getResource("/equipe.png"));
 		btnTeam.setIcon(resizeIcon(icon, 25, 25));
 		barraDeFerramentas.add(btnTeam);
-		
+
 		JPanel downPanel = new JPanel();
 		splitPane.setRightComponent(downPanel);
 		downPanel.setLayout(new BorderLayout(0, 0));
-		
+
 		JScrollPane scrollPaneMessages = new JScrollPane();
 		downPanel.add(scrollPaneMessages, BorderLayout.CENTER);
 		scrollPaneMessages.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPaneMessages.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		
+
 		this.textAreaMessages = new JTextArea();
 		this.textAreaMessages.setEditable(false);
 		scrollPaneMessages.setViewportView(this.textAreaMessages);
-		
+
 		JPanel status = new JPanel();
 		status.setMinimumSize(new Dimension(900, 25));
 		status.setPreferredSize(new Dimension(900, 25));
 		downPanel.add(status, BorderLayout.SOUTH);
 		SpringLayout sl_status = new SpringLayout();
 		status.setLayout(sl_status);
-		
+
 		this.lblStatus = new JLabel("novo");
 		sl_status.putConstraint(SpringLayout.NORTH, this.lblStatus, 0, SpringLayout.NORTH, status);
 		sl_status.putConstraint(SpringLayout.WEST, this.lblStatus, 10, SpringLayout.WEST, status);
@@ -241,94 +285,95 @@ public class Application {
 		frame.setMinimumSize(new Dimension(910, 600));
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
 		String newDocument = "newDocument";
-        KeyStroke newDocumentKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
-        btnNew.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(newDocumentKeyStroke, newDocument);
-        btnNew.getActionMap().put(newDocument, (Action) new AbstractAction() {
+		KeyStroke newDocumentKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
+		btnNew.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(newDocumentKeyStroke, newDocument);
+		btnNew.getActionMap().put(newDocument, (Action) new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
 				cleanNewFile();
-            }
-        });
-        
-        String openDocument = "openDocument";
-        KeyStroke openDocumentKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK);
-        btnOpen.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(openDocumentKeyStroke, openDocument);
-        btnOpen.getActionMap().put(openDocument, (Action) new AbstractAction() {
+			}
+		});
+
+		String openDocument = "openDocument";
+		KeyStroke openDocumentKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK);
+		btnOpen.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(openDocumentKeyStroke, openDocument);
+		btnOpen.getActionMap().put(openDocument, (Action) new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
 				openNewFile();
-            }
-        });
-        
-        String saveDocument = "saveDocument";
-        KeyStroke saveDocumentKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
-        btnSave.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(saveDocumentKeyStroke, saveDocument);
-        btnSave.getActionMap().put(saveDocument, (Action) new AbstractAction() {
+			}
+		});
+
+		String saveDocument = "saveDocument";
+		KeyStroke saveDocumentKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
+		btnSave.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(saveDocumentKeyStroke, saveDocument);
+		btnSave.getActionMap().put(saveDocument, (Action) new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
 				saveFile();
-            }
-        });
-        
-        String compileDocument = "compileDocument";
-        KeyStroke compileDocumentKeyStroke = KeyStroke.getKeyStroke("F7");
-        btnCompile.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(compileDocumentKeyStroke, compileDocument);
-        btnCompile.getActionMap().put(compileDocument, (Action) new AbstractAction() {
+			}
+		});
+
+		String compileDocument = "compileDocument";
+		KeyStroke compileDocumentKeyStroke = KeyStroke.getKeyStroke("F7");
+		btnCompile.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(compileDocumentKeyStroke, compileDocument);
+		btnCompile.getActionMap().put(compileDocument, (Action) new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
 				compile();
-            }
-        });
-        
-        String showTeam = "showTeam";
-        KeyStroke showTeamKeyStroke = KeyStroke.getKeyStroke("F1");
-        btnTeam.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(showTeamKeyStroke, showTeam);
-        btnTeam.getActionMap().put(showTeam, (Action) new AbstractAction() {
+			}
+		});
+
+		String showTeam = "showTeam";
+		KeyStroke showTeamKeyStroke = KeyStroke.getKeyStroke("F1");
+		btnTeam.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(showTeamKeyStroke, showTeam);
+		btnTeam.getActionMap().put(showTeam, (Action) new AbstractAction() {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent e) {
 				showTeam();
-            }
-        });
-		
+			}
+		});
+
 	}
-	
+
 	private void setFilePath(String path) {
 		this.lblStatus.setText(path);
 	}
-	
+
 	private void cleanNewFile() {
 		this.textAreaEditor.setText("");
-		this.textAreaMessages.setText("");;
+		this.textAreaMessages.setText("");
+		;
 		this.setFilePath("novo");
 	}
-	
+
 	private void openNewFile() {
 		JFileChooser fileChooser = new JFileChooser();
 		FileNameExtensionFilter txtFilter = new FileNameExtensionFilter("Arquivos de Texto (.txt)", "txt");
-        fileChooser.setFileFilter(txtFilter);
-        int result = fileChooser.showOpenDialog(frame);
+		fileChooser.setFileFilter(txtFilter);
+		int result = fileChooser.showOpenDialog(frame);
 
-        if (result == JFileChooser.APPROVE_OPTION) {
-        	String file = fileChooser.getSelectedFile().getAbsoluteFile().toString();
-        	textAreaMessages.setText("");
-        	
-        	try {
-        		textAreaEditor.setText("");
-                BufferedReader br = new BufferedReader(
-                		new InputStreamReader(new FileInputStream(file)));
-                textAreaEditor.read(br, br);
-                this.setFilePath(file);
-            } catch (Exception e) {}
-        }
+		if (result == JFileChooser.APPROVE_OPTION) {
+			String file = fileChooser.getSelectedFile().getAbsoluteFile().toString();
+			textAreaMessages.setText("");
+
+			try {
+				textAreaEditor.setText("");
+				BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+				textAreaEditor.read(br, br);
+				this.setFilePath(file);
+			} catch (Exception e) {
+			}
+		}
 	}
-	
+
 	private void saveFile() {
 		File file = new File(this.lblStatus.getText());
 		textAreaMessages.setText("");
@@ -338,12 +383,12 @@ public class Application {
 			this.saveNewFile();
 		}
 	}
-	
+
 	private void saveNewFile() {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int result = fileChooser.showOpenDialog(frame);
-		
+
 		if (result == JFileChooser.APPROVE_OPTION) {
 			String path = fileChooser.getSelectedFile().getAbsoluteFile().toString();
 			if (!path.endsWith(".txt")) {
@@ -352,53 +397,92 @@ public class Application {
 			this.updateFile(path);
 		}
 	}
-	
+
 	private void updateFile(String path) {
 		try {
 			Files.write(Paths.get(path), textAreaEditor.getText().getBytes());
 			this.setFilePath(path);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 	}
-	
+
 	private void copyText() {
 		String textToCopy = textAreaEditor.getSelectedText();
-        StringSelection stringSelection = new StringSelection(textToCopy);
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(stringSelection, null);
+		StringSelection stringSelection = new StringSelection(textToCopy);
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(stringSelection, null);
 	}
-	
+
 	private void pasteText() {
 		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		Transferable content = clipboard.getContents(null);
 		String text = "";
 		try {
 			text = (String) content.getTransferData(DataFlavor.stringFlavor);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		int position = textAreaEditor.getCaretPosition();
 		textAreaEditor.insert(text, position);
 	}
-	
+
 	private void cutText() {
 		this.copyText();
 		int start = textAreaEditor.getSelectionStart();
-        int end = textAreaEditor.getSelectionEnd();
-        textAreaEditor.replaceRange("", start, end);
+		int end = textAreaEditor.getSelectionEnd();
+		textAreaEditor.replaceRange("", start, end);
 	}
-	
+
 	private void compile() {
-		textAreaMessages.setText("Compilação de programas ainda não foi implementada");
+		Lexico lexico = new Lexico();
+		lexico.setInput(this.textAreaEditor.getText());
+		int maximo = this.textAreaEditor.getLineCount();
+		int contagem = maximo;
+		try {
+			Token t = null;
+			while ((t = lexico.nextToken()) != null) {
+				System.out.println(t.getLexeme());
+				System.out.println(this.dicionario.get(t.getId()));
+				System.out.println(maximo - contagem);
+				contagem--;
+				
+				// só escreve o lexema
+				// necessário escrever t.getId (), t.getPosition()
+
+				// t.getId () - retorna o identificador da classe.
+				// olhar Constants.java e adaptar, pois deve ser apresentada
+				// a classe por extenso
+				//
+				// t.getPosition () - retorna a posição inicial do lexema
+				// no editor, necessário adaptar para mostrar a linha
+
+				// esse código apresenta os tokens enquanto não ocorrer erro
+				// no entanto, os tokens devem ser apresentados SÓ se não
+				// ocorrer erro, necessário adaptar para atender o que foi
+				// solicitado
+			}
+		} catch (LexicalError e) { // tratamento de erros
+			this.textAreaMessages.append(e.getMessage() + " em " + e.getPosition());
+			System.out.println(e.getMessage() + " em " + e.getPosition());
+
+			// e.getMessage() - retorna a mensagem de erro de SCANNER_ERRO
+			// (olhar ScannerConstants.java e adaptar conforme o enunciado
+			// da parte 2)
+			//
+			// e.getPosition() - retorna a posição inicial do erro, tem
+			// que adaptar para mostrar a linha
+		}
 	}
-	
+
 	private void showTeam() {
 		textAreaMessages.setText("Integrantes: Augusto Juan Dalprá Arraga, Daniel Krüger e Luiz Henrique Martendal");
 	}
-	
+
 	private static Icon resizeIcon(Icon icon, int width, int height) {
-        if (icon instanceof ImageIcon) {
-            Image image = ((ImageIcon) icon).getImage();
-            Image resizedImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-            return new ImageIcon(resizedImage);
-        }
-        return icon;
-    }
+		if (icon instanceof ImageIcon) {
+			Image image = ((ImageIcon) icon).getImage();
+			Image resizedImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+			return new ImageIcon(resizedImage);
+		}
+		return icon;
+	}
 }
