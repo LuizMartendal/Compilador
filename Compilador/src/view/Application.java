@@ -42,9 +42,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Application {
 
@@ -52,7 +55,6 @@ public class Application {
 	private JTextArea textAreaMessages;
 	private JLabel lblStatus;
 	private JTextArea textAreaEditor;
-	private HashMap<Integer, String> dicionario = new HashMap<>();
 
 	/**
 	 * Launch the application.
@@ -74,45 +76,9 @@ public class Application {
 	 * Create the application.
 	 */
 	public Application() {
-		this.setHashMap();
 		initialize();
 	}
 
-	private void setHashMap() {
-		this.dicionario.put(Constants.t_constante_float, "constante float");
-		this.dicionario.put(Constants.t_constante_int, "constante int");
-		this.dicionario.put(Constants.t_constante_string, "constante string");
-		this.dicionario.put(Constants.t_do, "palavra reservada do");
-		this.dicionario.put(Constants.t_else, "palavra reservada else");
-		this.dicionario.put(Constants.t_false, "palavra reservada false");
-		this.dicionario.put(Constants.t_fun, "palavra reservada fun");
-		this.dicionario.put(Constants.t_identificador, "identificador");
-		this.dicionario.put(Constants.t_if, "palavra reservada if");
-		this.dicionario.put(Constants.t_in, "palavra reservada in");
-		this.dicionario.put(Constants.t_main, "palavra reservada main");
-		this.dicionario.put(Constants.t_out, "palavra reservada out");
-		this.dicionario.put(Constants.t_palavra_reservada, "palavra reservada");
-		this.dicionario.put(Constants.t_repeat, "palavra reservada repeat");
-		this.dicionario.put(Constants.t_TOKEN_18, "&");
-		this.dicionario.put(Constants.t_TOKEN_19, "|");
-		this.dicionario.put(Constants.t_TOKEN_20, "!");
-		this.dicionario.put(Constants.t_TOKEN_21, ",");
-		this.dicionario.put(Constants.t_TOKEN_22, ";");
-		this.dicionario.put(Constants.t_TOKEN_23, "=");
-		this.dicionario.put(Constants.t_TOKEN_24, ":");
-		this.dicionario.put(Constants.t_TOKEN_25, "(");
-		this.dicionario.put(Constants.t_TOKEN_26, ")");
-		this.dicionario.put(Constants.t_TOKEN_27, "{");
-		this.dicionario.put(Constants.t_TOKEN_28, "}");
-		this.dicionario.put(Constants.t_TOKEN_29, "==");
-		this.dicionario.put(Constants.t_TOKEN_30, "!=");
-		this.dicionario.put(Constants.t_TOKEN_31, "<");
-		this.dicionario.put(Constants.t_TOKEN_32, ">");
-		this.dicionario.put(Constants.t_TOKEN_33, "+");
-		this.dicionario.put(Constants.t_TOKEN_34, "-");
-		this.dicionario.put(Constants.t_TOKEN_35, "*");
-		this.dicionario.put(Constants.t_TOKEN_36, "/");
-	}
 
 	/**
 	 * Initialize the contents of the frame.
@@ -435,15 +401,21 @@ public class Application {
 	private void compile() {
 		Lexico lexico = new Lexico();
 		lexico.setInput(this.textAreaEditor.getText());
-		int maximo = this.textAreaEditor.getLineCount();
-		int contagem = maximo;
+		
+		Field fields[] = Constants.class.getDeclaredFields();
+		Pattern pattern = Pattern.compile("TOKEN" + ".*");
+		Matcher matcher = null;
 		try {
 			Token t = null;
 			while ((t = lexico.nextToken()) != null) {
-				System.out.println(t.getLexeme());
-				System.out.println(this.dicionario.get(t.getId()));
-				System.out.println(maximo - contagem);
-				contagem--;
+				matcher = pattern.matcher(fields[t.getId()].getName());
+				this.textAreaMessages.append(t.getLexeme());
+				if (matcher.find()) {
+					this.textAreaMessages.append("símbolo_especial");
+				} else {
+					this.textAreaMessages.append("    " + fields[t.getId()].getName() + "    ");
+				}
+				this.textAreaMessages.append("Linha: " + getLine(this.textAreaEditor.getText(), t.getPosition()) + "\n");
 				
 				// só escreve o lexema
 				// necessário escrever t.getId (), t.getPosition()
@@ -471,6 +443,18 @@ public class Application {
 			// e.getPosition() - retorna a posição inicial do erro, tem
 			// que adaptar para mostrar a linha
 		}
+	}
+
+	private int getLine(String lexeme, int position) {
+		int linha = 1;
+		for (int i = 0; i < lexeme.length() && i <= position; i++) {
+			char c = lexeme.charAt(i);
+			if (c == '\n') {
+				linha++;
+			}
+		}
+		
+		return linha;
 	}
 
 	private void showTeam() {
