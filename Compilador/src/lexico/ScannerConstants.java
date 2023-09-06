@@ -961,10 +961,10 @@ public interface ScannerConstants
 
     String[] SCANNER_ERROR =
     {
-        "Símbolo inválido",
+        "símbolo inválido",
         "",
         "",
-        "Erro identificando constante_string",
+        "constante_string inválida",
         "",
         "",
         "",
@@ -982,22 +982,22 @@ public interface ScannerConstants
         "",
         "",
         "comentário de bloco inválido ou não finalizado",
-        "Erro identificando identificador",
+        "identificador inválido",
         "",
         "",
         "",
         "",
         "",
         "",
-        "Erro identificando constante_string",
-        "Erro identificando constante_float",
+        "constante_string inválida",
+        "constante_float inválida",
         "",
         "",
-        "Erro identificando identificador",
+        "identificador inválido",
         "",
         "",
         "",
-        "Erro identificando constante_float",
+        "constante_float inválida",
         ""
     };
 

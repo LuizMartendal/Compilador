@@ -408,9 +408,8 @@ public class Application {
 		Matcher matcher = null;
 		
 		this.textAreaMessages.append("Linha" + "\t" + "Classe" + "\t\t" + "Lexema\n");
-		
+		Token t = null;
 		try {
-			Token t = null;
 			while ((t = lexico.nextToken()) != null) {
 				matcher = pattern.matcher(fields[t.getId()].getName());
 				this.textAreaMessages.append(getLine(this.textAreaEditor.getText(), t.getPosition()) + "\t");
@@ -441,9 +440,14 @@ public class Application {
 				// solicitado
 			}
 			this.textAreaMessages.append("\n" + "Programa compilado com sucesso");
-		} catch (LexicalError e) { // tratamento de erros
-			this.textAreaMessages.setText("Linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + e.getMessage());
-
+		} catch (LexicalError e) {
+			if (e.getMessage().contains("símbolo") || e.getMessage().contains("palavra reservada") || e.getMessage().contains("identificador")) {
+				this.textAreaMessages.setText("Linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + getMessage(e.getPosition()) + " " + e.getMessage());
+			} else {
+				this.textAreaMessages.setText("Linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + e.getMessage());				
+			}
+			
+			// tratamento de erros
 			// e.getMessage() - retorna a mensagem de erro de SCANNER_ERRO
 			// (olhar ScannerConstants.java e adaptar conforme o enunciado
 			// da parte 2)
@@ -463,6 +467,18 @@ public class Application {
 		}
 		
 		return linha;
+	}
+	
+	private String getMessage(int position) {
+		String str = "";
+		while (position != this.textAreaEditor.getText().length()) {
+			if (this.textAreaEditor.getText().charAt(position) == ' ') {
+				break;
+			}
+			str += this.textAreaEditor.getText().charAt(position);
+			position++;
+		}
+		return str;
 	}
 
 	private void showTeam() {
