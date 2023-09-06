@@ -45,7 +45,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -399,23 +398,32 @@ public class Application {
 	}
 
 	private void compile() {
+		this.textAreaMessages.setText("");
+		
 		Lexico lexico = new Lexico();
 		lexico.setInput(this.textAreaEditor.getText());
 		
 		Field fields[] = Constants.class.getDeclaredFields();
 		Pattern pattern = Pattern.compile("TOKEN" + ".*");
 		Matcher matcher = null;
+		
+		this.textAreaMessages.append("Linha" + "\t" + "Classe" + "\t\t" + "Lexema\n");
+		
 		try {
 			Token t = null;
 			while ((t = lexico.nextToken()) != null) {
 				matcher = pattern.matcher(fields[t.getId()].getName());
-				this.textAreaMessages.append(t.getLexeme());
+				this.textAreaMessages.append(getLine(this.textAreaEditor.getText(), t.getPosition()) + "\t");
 				if (matcher.find()) {
-					this.textAreaMessages.append("símbolo_especial");
+					this.textAreaMessages.append("símbolo_especial" + "\t");
 				} else {
-					this.textAreaMessages.append("    " + fields[t.getId()].getName() + "    ");
+					if (fields[t.getId()].getName().length() <= 10) {
+						this.textAreaMessages.append(fields[t.getId()].getName() + "\t");
+					} else {
+						this.textAreaMessages.append(fields[t.getId()].getName());
+					}
 				}
-				this.textAreaMessages.append("Linha: " + getLine(this.textAreaEditor.getText(), t.getPosition()) + "\n");
+				this.textAreaMessages.append("\t" + t.getLexeme() + "\n");
 				
 				// só escreve o lexema
 				// necessário escrever t.getId (), t.getPosition()
@@ -432,9 +440,9 @@ public class Application {
 				// ocorrer erro, necessário adaptar para atender o que foi
 				// solicitado
 			}
+			this.textAreaMessages.append("\n" + "Programa compilado com sucesso");
 		} catch (LexicalError e) { // tratamento de erros
-			this.textAreaMessages.append(e.getMessage() + " em " + e.getPosition());
-			System.out.println(e.getMessage() + " em " + e.getPosition());
+			this.textAreaMessages.setText("Linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + e.getMessage());
 
 			// e.getMessage() - retorna a mensagem de erro de SCANNER_ERRO
 			// (olhar ScannerConstants.java e adaptar conforme o enunciado
@@ -445,10 +453,10 @@ public class Application {
 		}
 	}
 
-	private int getLine(String lexeme, int position) {
+	private int getLine(String textArea, int position) {
 		int linha = 1;
-		for (int i = 0; i < lexeme.length() && i <= position; i++) {
-			char c = lexeme.charAt(i);
+		for (int i = 0; i < textArea.length() && i <= position; i++) {
+			char c = textArea.charAt(i);
 			if (c == '\n') {
 				linha++;
 			}
