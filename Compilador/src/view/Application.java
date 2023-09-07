@@ -33,6 +33,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import lexico.Constants;
 import lexico.LexicalError;
 import lexico.Lexico;
+import lexico.ScannerConstants;
 import lexico.Token;
 
 import java.awt.event.ActionListener;
@@ -416,6 +417,9 @@ public class Application {
 				if (matcher.find()) {
 					this.textAreaMessages.append("símbolo_especial" + "\t");
 				} else {
+					if (t.getId() == 2) {
+						throw new LexicalError(ScannerConstants.SCANNER_ERROR[38], t.getPosition());
+					}
 					if (fields[t.getId()].getName().length() <= 10) {
 						this.textAreaMessages.append(fields[t.getId()].getName() + "\t");
 					} else {
@@ -472,7 +476,7 @@ public class Application {
 	private String getMessage(int position) {
 		String str = "";
 		while (position != this.textAreaEditor.getText().length()) {
-			if (this.textAreaEditor.getText().charAt(position) == ' ') {
+			if (this.textAreaEditor.getText().charAt(position) == ' ' || this.textAreaEditor.getText().charAt(position) == '\n') {
 				break;
 			}
 			str += this.textAreaEditor.getText().charAt(position);

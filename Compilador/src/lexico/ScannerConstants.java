@@ -998,7 +998,8 @@ public interface ScannerConstants
         "",
         "",
         "constante_float inválida",
-        ""
+        "",
+        "palavra reservada inválida"
     };
 
 }
