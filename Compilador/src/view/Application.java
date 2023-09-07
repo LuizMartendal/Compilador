@@ -420,13 +420,15 @@ public class Application {
 					if (t.getId() == 2) {
 						throw new LexicalError(ScannerConstants.SCANNER_ERROR[38], t.getPosition());
 					}
-					if (fields[t.getId()].getName().length() <= 10) {
-						this.textAreaMessages.append(fields[t.getId()].getName() + "\t");
-					} else {
+					if (matcher.find()) {
 						this.textAreaMessages.append(fields[t.getId()].getName());
+					} else if (fields[t.getId()].getName().length() <= 16) {
+						this.textAreaMessages.append(fields[t.getId()].getName() + "\t" + "\t");
+					} else {
+						this.textAreaMessages.append(fields[t.getId()].getName() + "\t");
 					}
 				}
-				this.textAreaMessages.append("\t" + t.getLexeme() + "\n");
+				this.textAreaMessages.append(t.getLexeme() + "\n");
 				
 				// só escreve o lexema
 				// necessário escrever t.getId (), t.getPosition()
