@@ -447,7 +447,9 @@ public class Application {
 			}
 			this.textAreaMessages.append("\n" + "Programa compilado com sucesso");
 		} catch (LexicalError e) {
-			if (e.getMessage().contains("símbolo") || e.getMessage().contains("palavra reservada") || e.getMessage().contains("identificador")) {
+			if (e.getMessage().contains("símbolo")) {
+				this.textAreaMessages.setText("Linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + this.textAreaEditor.getText().charAt(e.getPosition()) + " " + e.getMessage());
+			} else if (e.getMessage().contains("palavra reservada") || e.getMessage().contains("identificador")) {
 				this.textAreaMessages.setText("Linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + getMessage(e.getPosition()) + " " + e.getMessage());
 			} else {
 				this.textAreaMessages.setText("Linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + e.getMessage());				
