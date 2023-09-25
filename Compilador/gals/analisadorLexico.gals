@@ -1,11 +1,14 @@
 #Options
 GenerateScanner = true
-GenerateParser = false
+GenerateParser = true
 Language = Java
 ScannerName = Lexico
+ParserName = Sintatico
+SemanticName = Semantico
 ScannerCaseSensitive = true
 ScannerTable = Compact
-Input = String
+Input = Stream
+Parser = SLR
 #RegularDefinitions
 pp: "_" (i | f | b | s)
 maiusculo: [A-Z]
@@ -76,3 +79,64 @@ while= palavra_reservada: "while"
 // :!{linha}
 :! "#" (.)*
 :! "[" ([^"[" "]"])* "]"
+#NonTerminals
+<geral>
+<cmd>
+<aux1>
+<aux2>
+<aux3>
+<aux4>
+<aux5>
+<aux6>
+<aux7>
+<listinst>
+<listid>
+<listin>
+<listexp>
+<listcmd>
+<instrucao>
+<decconst>
+<expressao>
+<decvar>
+<valor>
+<atri>
+<entrada>
+<saida>
+<selecao>
+<repeticao>
+#Grammar
+<geral> ::= fun main "{" <listinst> "}";
+
+
+<listinst> ::= <instrucao> ";" <aux1>;
+<aux1> ::= <listinst> | î;
+
+<instrucao> ::= <decconst> | <decvar> | <cmd>;
+
+<decconst> ::= <listid> ":" <valor>;
+<listid> ::= identificador <aux2>;
+<aux2> ::= "," <listid> | î;
+
+<valor> ::= constante_int | constante_float | constante_string | false | true;
+
+<decvar> ::= <listid>;
+
+<cmd> ::= <atri> | <entrada> | <saida> | <selecao> | <repeticao>;
+
+<atri> ::= <listid> "=" <expressao>;
+<entrada> ::= in "(" <listin> ")";
+<listin> ::= constante_string "," <aux3> | <aux3>;
+<aux3> ::= <listid> <aux4>;
+<aux4> ::= î | ";" <listin>;
+
+<saida> ::= out "(" <listexp> ")";
+<listexp> ::= <expressao> <aux5>;
+<aux5> ::= î | "," <listexp>;
+
+<selecao> ::= if "(" <expressao> ")" "{" <listcmd> "}" <aux6>;
+<listcmd> ::= <cmd> <aux7>;
+<aux7> ::= î | <listcmd>;
+<aux6> ::= î | else "{" <listcmd> "}";
+
+<repeticao> ::= while "(" <expressao> ")" do "{" <listcmd> "}" | repeat "{" <listcmd> "}" while "(" <expressao> ")";
+
