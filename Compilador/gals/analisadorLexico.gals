@@ -8,7 +8,7 @@ SemanticName = Semantico
 ScannerCaseSensitive = true
 ScannerTable = Compact
 Input = Stream
-Parser = SLR
+Parser = LL
 #RegularDefinitions
 pp: "_" (i | f | b | s)
 maiusculo: [A-Z]
@@ -89,21 +89,29 @@ while= palavra_reservada: "while"
 <aux5>
 <aux6>
 <aux7>
+<aux8>
 <listinst>
 <listid>
 <listin>
 <listexp>
 <listcmd>
 <instrucao>
-<decconst>
 <expressao>
-<decvar>
 <valor>
-<atri>
 <entrada>
 <saida>
 <selecao>
 <repeticao>
+<elemento>
+<expressao_>
+<relacional>
+<relacional_>
+<operador_relacional>
+<aritmetica>
+<aritmetica_>
+<termo>
+<termo_>
+<fator>
 #Grammar
 <geral> ::= fun main "{" <listinst> "}";
 
@@ -111,19 +119,16 @@ while= palavra_reservada: "while"
 <listinst> ::= <instrucao> ";" <aux1>;
 <aux1> ::= <listinst> | î;
 
-<instrucao> ::= <decconst> | <decvar> | <cmd>;
+<instrucao> ::= <listid> <aux8> | <cmd>;
 
-<decconst> ::= <listid> ":" <valor>;
+<aux8> ::= ":" <valor> | î | "=" <expressao>;
 <listid> ::= identificador <aux2>;
 <aux2> ::= "," <listid> | î;
 
 <valor> ::= constante_int | constante_float | constante_string | false | true;
 
-<decvar> ::= <listid>;
+<cmd> ::= <entrada> | <saida> | <selecao> | <repeticao>;
 
-<cmd> ::= <atri> | <entrada> | <saida> | <selecao> | <repeticao>;
-
-<atri> ::= <listid> "=" <expressao>;
 <entrada> ::= in "(" <listin> ")";
 <listin> ::= constante_string "," <aux3> | <aux3>;
 <aux3> ::= <listid> <aux4>;
@@ -134,9 +139,32 @@ while= palavra_reservada: "while"
 <aux5> ::= î | "," <listexp>;
 
 <selecao> ::= if "(" <expressao> ")" "{" <listcmd> "}" <aux6>;
-<listcmd> ::= <cmd> <aux7>;
+<listcmd> ::= <cmd> ";" <aux7>;
 <aux7> ::= î | <listcmd>;
 <aux6> ::= î | else "{" <listcmd> "}";
 
 <repeticao> ::= while "(" <expressao> ")" do "{" <listcmd> "}" | repeat "{" <listcmd> "}" while "(" <expressao> ")";
 
+
+
+<expressao>			::= <elemento> <expressao_>  ;
+<expressao_>			::= î | "&" <elemento> <expressao_> | "|" <elemento> <expressao_> ;
+<elemento>			::= <relacional> | true | false | "!" <elemento> ;
+
+<relacional>			::= <aritmetica> <relacional_> ;
+<relacional_>			::= î | <operador_relacional> <aritmetica> ;
+<operador_relacional>	::= "==" | "!=" | "<" | ">" ;
+
+<aritmetica>			::= <termo> <aritmetica_>  ;
+<aritmetica_>			::= î | "+" <termo> <aritmetica_> | "-" <termo> <aritmetica_> ;
+
+<termo>			::= <fator> <termo_> ;
+<termo_>			::= î | "*" <fator> <termo_> | "/" <fator> <termo_> ;
+
+<fator>			::= identificador | 
+			    	    constante_int | 
+		   	    	    constante_float | 
+			    	    constante_string | 
+		   	    	    "(" <expressao> ")" |
+	    	  	    	    "+" <fator> | 
+	    		    	    "-" <fator> ;
