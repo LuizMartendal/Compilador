@@ -1,4 +1,4 @@
-package lexico;
+package util;
 
 public interface ScannerConstants
 {
@@ -961,13 +961,10 @@ public interface ScannerConstants
 
     String[] SCANNER_ERROR =
     {
-        "símbolo inválido",
+        "Caractere nÃ£o esperado",
         "",
         "",
-        "constante_string inválida",
-        "",
-        "",
-        "",
+        "Erro identificando constante_string",
         "",
         "",
         "",
@@ -981,25 +978,27 @@ public interface ScannerConstants
         "",
         "",
         "",
-        "comentário de bloco inválido ou não finalizado",
-        "identificador inválido",
+        "",
+        "",
+        "",
+        "Erro identificando <ignorar>",
+        "Erro identificando identificador",
         "",
         "",
         "",
         "",
         "",
         "",
-        "constante_string inválida",
-        "constante_float inválida",
+        "Erro identificando constante_string",
+        "Erro identificando constante_float",
         "",
         "",
-        "identificador inválido",
+        "Erro identificando identificador",
         "",
         "",
         "",
-        "constante_float inválida",
-        "",
-        "palavra reservada inválida"
+        "Erro identificando constante_float",
+        ""
     };
 
 }

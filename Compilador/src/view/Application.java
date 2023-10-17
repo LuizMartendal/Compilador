@@ -30,11 +30,11 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import lexico.Constants;
-import lexico.LexicalError;
-import lexico.Lexico;
-import lexico.ScannerConstants;
-import lexico.Token;
+import util.Constants;
+import util.LexicalError;
+import util.Lexico;
+import util.ScannerConstants;
+import util.Token;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
