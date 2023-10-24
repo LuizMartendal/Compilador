@@ -961,13 +961,10 @@ public interface ScannerConstants
 
     String[] SCANNER_ERROR =
     {
-        "Caractere não esperado",
+        "simbolo invalido",
         "",
         "",
-        "Erro identificando constante_string",
-        "",
-        "",
-        "",
+        "constante_string invalido",
         "",
         "",
         "",
@@ -981,24 +978,28 @@ public interface ScannerConstants
         "",
         "",
         "",
-        "Erro identificando <ignorar>",
-        "Erro identificando identificador",
+        "",
+        "",
+        "",
+        "comentario de bloco invalido ou nao finalizado",
+        "identificador invalido",
         "",
         "",
         "",
         "",
         "",
         "",
-        "Erro identificando constante_string",
-        "Erro identificando constante_float",
+        "constante_string invalido",
+        "constante_float invalido",
         "",
         "",
-        "Erro identificando identificador",
+        "identificador invalido",
         "",
         "",
         "",
-        "Erro identificando constante_float",
-        ""
+        "constante_float invalido",
+        "",
+        "palavra reservada invalida"
     };
 
 }

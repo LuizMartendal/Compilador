@@ -30,11 +30,13 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import util.Constants;
 import util.LexicalError;
 import util.Lexico;
 import util.ScannerConstants;
-import util.Token;
+import util.SemanticError;
+import util.Semantico;
+import util.Sintatico;
+import util.SyntaticError;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -43,11 +45,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Application {
 
@@ -402,67 +401,43 @@ public class Application {
 		this.textAreaMessages.setText("");
 		
 		Lexico lexico = new Lexico();
+		Sintatico sintatico = new Sintatico();
+		Semantico semantico = new Semantico();
 		lexico.setInput(this.textAreaEditor.getText());
 		
-		Field fields[] = Constants.class.getDeclaredFields();
-		Pattern pattern = Pattern.compile("TOKEN" + ".*");
-		Matcher matcher = null;
-		
-		this.textAreaMessages.append("Linha" + "\t" + "Classe" + "\t\t" + "Lexema\n");
-		Token t = null;
 		try {
-			while ((t = lexico.nextToken()) != null) {
-				matcher = pattern.matcher(fields[t.getId()].getName());
-				this.textAreaMessages.append(getLine(this.textAreaEditor.getText(), t.getPosition()) + "\t");
-				if (matcher.find()) {
-					this.textAreaMessages.append("símbolo_especial" + "\t");
-				} else {
-					if (t.getId() == 2) {
-						throw new LexicalError(ScannerConstants.SCANNER_ERROR[38], t.getPosition());
-					}
-					if (matcher.find()) {
-						this.textAreaMessages.append(fields[t.getId()].getName());
-					} else if (fields[t.getId()].getName().length() <= 16) {
-						this.textAreaMessages.append(fields[t.getId()].getName() + "\t" + "\t");
-					} else {
-						this.textAreaMessages.append(fields[t.getId()].getName() + "\t");
-					}
-				}
-				this.textAreaMessages.append(t.getLexeme() + "\n");
-				
-				// só escreve o lexema
-				// necessário escrever t.getId (), t.getPosition()
-
-				// t.getId () - retorna o identificador da classe.
-				// olhar Constants.java e adaptar, pois deve ser apresentada
-				// a classe por extenso
-				//
-				// t.getPosition () - retorna a posição inicial do lexema
-				// no editor, necessário adaptar para mostrar a linha
-
-				// esse código apresenta os tokens enquanto não ocorrer erro
-				// no entanto, os tokens devem ser apresentados SÓ se não
-				// ocorrer erro, necessário adaptar para atender o que foi
-				// solicitado
-			}
-			this.textAreaMessages.append("\n" + "Programa compilado com sucesso");
+			sintatico.parse(lexico, semantico);
+			this.textAreaMessages.append("Programa compilado com sucesso");
 		} catch (LexicalError e) {
-			if (e.getMessage().contains("símbolo")) {
-				this.textAreaMessages.setText("Linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + this.textAreaEditor.getText().charAt(e.getPosition()) + " " + e.getMessage());
-			} else if (e.getMessage().contains("palavra reservada") || e.getMessage().contains("identificador")) {
-				this.textAreaMessages.setText("Linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + getMessage(e.getPosition()) + " " + e.getMessage());
-			} else {
-				this.textAreaMessages.setText("Linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + e.getMessage());				
-			}
+			this.lexicalError(e);
 			
 			// tratamento de erros
 			// e.getMessage() - retorna a mensagem de erro de SCANNER_ERRO
 			// (olhar ScannerConstants.java e adaptar conforme o enunciado
 			// da parte 2)
 			//
-			// e.getPosition() - retorna a posição inicial do erro, tem
+			// e.getPosition() - retorna a posiï¿½ï¿½o inicial do erro, tem
 			// que adaptar para mostrar a linha
-		}
+		} catch (SyntaticError sye) {
+			switch (sye.getToken().getId()) {
+				case 2: this.lexicalError(new LexicalError(ScannerConstants.SCANNER_ERROR[38], sye.getPosition())); break;
+				case 4: this.textAreaMessages.setText("Erro na linha " + this.getLine(this.textAreaEditor.getText(), sye.getPosition()) + " - encontrado constante_int " + sye.getMessage()); break;
+				case 5: this.textAreaMessages.setText("Erro na linha " + this.getLine(this.textAreaEditor.getText(), sye.getPosition()) + " - encontrado constante_float " + sye.getMessage()); break;
+				case 6: this.textAreaMessages.setText("Erro na linha " + this.getLine(this.textAreaEditor.getText(), sye.getPosition()) + " - encontrado constante_string " + sye.getMessage()); break;
+				default: this.textAreaMessages.setText("Erro na linha " + this.getLine(this.textAreaEditor.getText(), sye.getPosition()) + " - encontrado " + this.getMessage(sye.getPosition()) + " " + sye.getMessage());
+			}
+		} catch (SemanticError se) {
+		} 
+	}
+
+	private void lexicalError(LexicalError e) {
+		if (e.getMessage().contains("simbolo")) {
+				this.textAreaMessages.setText("Erro na linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + this.textAreaEditor.getText().charAt(e.getPosition()) + " " + e.getMessage());
+			} else if (e.getMessage().contains("palavra reservada") || e.getMessage().contains("identificador")) {
+				this.textAreaMessages.setText("Erro na linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + getMessage(e.getPosition()) + " " + e.getMessage());
+			} else {
+				this.textAreaMessages.setText("Erro na linha " + getLine(this.textAreaEditor.getText(), e.getPosition()) + ": " + e.getMessage());				
+			}
 	}
 
 	private int getLine(String textArea, int position) {
@@ -486,11 +461,11 @@ public class Application {
 			str += this.textAreaEditor.getText().charAt(position);
 			position++;
 		}
-		return str;
+		return !str.isBlank() ? str : "EOF";
 	}
 
 	private void showTeam() {
-		textAreaMessages.setText("Integrantes: Augusto Juan Dalprá Arraga, Daniel Krüger e Luiz Henrique Martendal");
+		textAreaMessages.setText("Integrantes: Augusto Juan Dalprï¿½ Arraga, Daniel Krï¿½ger e Luiz Henrique Martendal");
 	}
 
 	private static Icon resizeIcon(Icon icon, int width, int height) {
