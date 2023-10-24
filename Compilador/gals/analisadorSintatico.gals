@@ -1,0 +1,173 @@
+#Options
+GenerateScanner = true
+GenerateParser = true
+Language = Java
+ScannerName = Lexico
+ParserName = Sintatico
+SemanticName = Semantico
+ScannerCaseSensitive = true
+ScannerTable = Compact
+Input = Stream
+Parser = LL
+#RegularDefinitions
+pp: "_" (i | f | b | s)
+maiusculo: [A-Z]
+minusculo: [a-z]
+mindig: [a-z0-9]
+inicio: ({maiusculo} {mindig} | {minusculo})
+resto: ({maiusculo} {mindig} | {mindig})
+int: 0 | [1-9][0-9]*
+letra: (i | f | s | b)
+
+#Tokens
+palavra_reservada: [a-z]+
+
+// identificador
+identificador: {pp} ({maiusculo} | (({inicio}) ({resto})* {maiusculo}?))
+
+// constante_int 
+constante_int: {int}
+
+// constante_float
+constante_float: {int} "." [0-9](0* [1-9])*
+
+// constante_string
+constante_string: \" ([^\n\"\\"%"] | "%" {letra})* \"
+
+// rela��o de palavras reservadas
+// do if else false fun in main out repeat true while
+// do = palavra: "do"
+do = palavra_reservada: "do"
+if = palavra_reservada: "if"
+else = palavra_reservada: "else"
+false = palavra_reservada: "false"
+fun = palavra_reservada: "fun"
+in = palavra_reservada: "in"
+main = palavra_reservada: "main"
+out = palavra_reservada: "out"
+repeat = palavra_reservada: "repeat"
+true = palavra_reservada: "true"
+while= palavra_reservada: "while"
+
+// rela��o de s�mbolos especias
+// & | ! , ; = : ( ) { } == != < > + - * /
+"&"
+"|"
+"!"
+","
+";"
+"="
+":"
+"("
+")"
+"{"
+"}"
+"=="
+"!="
+"<"
+">"
+"+"
+"-"
+"*"
+"/" 
+
+// reconher e ignorar caracteres de formata��o
+// :[\n\t\s\r]
+: [\n\t\s\r]
+
+// reconhecer e ignorar coment�rios de linha e de bloco
+// :!{linha}
+:! "#" (.)*
+:! "[" ([^"[" "]"])* "]"
+#NonTerminals
+<geral>
+<cmd>
+<aux1>
+<aux2>
+<aux3>
+<aux4>
+<aux5>
+<aux6>
+<aux7>
+<aux8>
+<listinst>
+<listid>
+<listin>
+<listexp>
+<listcmd>
+<instrucao>
+<expressao>
+<valor>
+<entrada>
+<saida>
+<selecao>
+<repeticao>
+<elemento>
+<expressao_>
+<relacional>
+<relacional_>
+<operador_relacional>
+<aritmetica>
+<aritmetica_>
+<termo>
+<termo_>
+<fator>
+<atribuicao>
+#Grammar
+<geral> ::= fun main "{" <listinst> "}";
+
+
+<listinst> ::= <instrucao> ";" <aux1>;
+<aux1> ::= <listinst> | î;
+
+<instrucao> ::= <listid> <aux8> | <entrada> | <saida> | <selecao> | <repeticao>;
+
+<aux8> ::= ":" <valor> | î | "=" <expressao>;
+<listid> ::= identificador <aux2>;
+<aux2> ::= "," <listid> | î;
+
+<valor> ::= constante_int | constante_float | constante_string | false | true;
+
+<cmd> ::= <entrada> | <saida> | <selecao> | <repeticao> | <atribuicao>;
+
+<atribuicao> ::= <listid> "=" <expressao>;
+
+<entrada> ::= in "(" <listin> ")";
+<listin> ::= constante_string "," <aux3> | <aux3>;
+<aux3> ::= <listid> <aux4>;
+<aux4> ::= î | ";" <listin>;
+
+<saida> ::= out "(" <listexp> ")";
+<listexp> ::= <expressao> <aux5>;
+<aux5> ::= î | "," <listexp>;
+
+<selecao> ::= if "(" <expressao> ")" "{" <listcmd> "}" <aux6>;
+<listcmd> ::= <cmd> ";" <aux7>;
+<aux7> ::= î | <listcmd>;
+<aux6> ::= î | else "{" <listcmd> "}";
+
+<repeticao> ::= while "(" <expressao> ")" do "{" <listcmd> "}" | repeat "{" <listcmd> "}" while "(" <expressao> ")";
+
+
+
+<expressao>			::= <elemento> <expressao_>  ;
+<expressao_>			::= î | "&" <elemento> <expressao_> | "|" <elemento> <expressao_> ;
+<elemento>			::= <relacional> | true | false | "!" <elemento> ;
+
+<relacional>			::= <aritmetica> <relacional_> ;
+<relacional_>			::= î | <operador_relacional> <aritmetica> ;
+<operador_relacional>	::= "==" | "!=" | "<" | ">" ;
+
+<aritmetica>			::= <termo> <aritmetica_>  ;
+<aritmetica_>			::= î | "+" <termo> <aritmetica_> | "-" <termo> <aritmetica_> ;
+
+<termo>			::= <fator> <termo_> ;
+<termo_>			::= î | "*" <fator> <termo_> | "/" <fator> <termo_> ;
+
+<fator>			::= identificador | 
+			    	    constante_int | 
+		   	    	    constante_float | 
+			    	    constante_string | 
+		   	    	    "(" <expressao> ")" |
+	    	  	    	    "+" <fator> | 
+	    		    	    "-" <fator> ;
