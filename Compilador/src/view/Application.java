@@ -424,7 +424,7 @@ public class Application {
 				case 4: this.textAreaMessages.setText("Erro na linha " + this.getLine(this.textAreaEditor.getText(), sye.getPosition()) + " - encontrado constante_int " + sye.getMessage()); break;
 				case 5: this.textAreaMessages.setText("Erro na linha " + this.getLine(this.textAreaEditor.getText(), sye.getPosition()) + " - encontrado constante_float " + sye.getMessage()); break;
 				case 6: this.textAreaMessages.setText("Erro na linha " + this.getLine(this.textAreaEditor.getText(), sye.getPosition()) + " - encontrado constante_string " + sye.getMessage()); break;
-				default: this.textAreaMessages.setText("Erro na linha " + this.getLine(this.textAreaEditor.getText(), sye.getPosition()) + " - encontrado " + this.getMessage(sye.getPosition()) + " " + sye.getMessage());
+				default: this.textAreaMessages.setText("Erro na linha " + this.getLine(this.textAreaEditor.getText(), sye.getPosition()) + " - encontrado " + sye.getToken().getLexeme() + " " + sye.getMessage());
 			}
 		} catch (SemanticError se) {
 		} 
