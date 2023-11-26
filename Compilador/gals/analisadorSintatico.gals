@@ -114,60 +114,60 @@ while= palavra_reservada: "while"
 <fator>
 <atribuicao>
 #Grammar
-<geral> ::= fun main "{" <listinst> "}";
+<geral> ::= #100 fun main "{" <listinst> "}" #101;
 
 
 <listinst> ::= <instrucao> ";" <aux1>;
-<aux1> ::= <listinst> | Ã®;
+<aux1> ::= <listinst> | î;
 
 <instrucao> ::= <listid> <aux8> | <entrada> | <saida> | <selecao> | <repeticao>;
 
-<aux8> ::= ":" <valor> | Ã® | "=" <expressao>;
-<listid> ::= identificador <aux2>;
-<aux2> ::= "," <listid> | Ã®;
+<aux8> ::= ":" <valor> #126 | #127 î | "=" <expressao> #128;
+<listid> ::= identificador #125 <aux2>;
+<aux2> ::= "," <listid> | î;
 
 <valor> ::= constante_int | constante_float | constante_string | false | true;
 
 <cmd> ::= <entrada> | <saida> | <selecao> | <repeticao> | <atribuicao>;
 
-<atribuicao> ::= <listid> "=" <expressao>;
+<atribuicao> ::= <listid> "=" <expressao> #128;
 
 <entrada> ::= in "(" <listin> ")";
-<listin> ::= constante_string "," <aux3> | <aux3>;
-<aux3> ::= <listid> <aux4>;
-<aux4> ::= Ã® | ";" <listin>;
+<listin> ::= constante_string #130 "," <aux3> | <aux3>;
+<aux3> ::= <listid> #139 <aux4>;
+<aux4> ::= î | ";" <listin>;
 
 <saida> ::= out "(" <listexp> ")";
-<listexp> ::= <expressao> <aux5>;
-<aux5> ::= Ã® | "," <listexp>;
+<listexp> ::= <expressao> #102 <aux5>;
+<aux5> ::= î | "," <listexp>;
 
-<selecao> ::= if "(" <expressao> ")" "{" <listcmd> "}" <aux6>;
+<selecao> ::= if "(" <expressao> ")" #118 "{" <listcmd> "}" <aux6> #119;
 <listcmd> ::= <cmd> ";" <aux7>;
-<aux7> ::= Ã® | <listcmd>;
-<aux6> ::= Ã® | else "{" <listcmd> "}";
+<aux7> ::= î | <listcmd>;
+<aux6> ::= î | #120 else "{" <listcmd> "}";
 
-<repeticao> ::= while "(" <expressao> ")" do "{" <listcmd> "}" | repeat "{" <listcmd> "}" while "(" <expressao> ")";
+<repeticao> ::= #121 while "(" <expressao> ")" #122 do "{" <listcmd> "}" #123 | #121 repeat "{" <listcmd> "}" while "(" <expressao> ")" #124;
 
 
 
 <expressao>			::= <elemento> <expressao_>  ;
-<expressao_>			::= Ã® | "&" <elemento> <expressao_> | "|" <elemento> <expressao_> ;
-<elemento>			::= <relacional> | true | false | "!" <elemento> ;
+<expressao_>			::= î | "&" <elemento> #103 <expressao_> | "|" <elemento> #104 <expressao_> ;
+<elemento>			::= <relacional> | true #105 | false #106 | "!" <elemento> #107 ;
 
 <relacional>			::= <aritmetica> <relacional_> ;
-<relacional_>			::= Ã® | <operador_relacional> <aritmetica> ;
+<relacional_>			::= î | <operador_relacional> #108 <aritmetica> #109;
 <operador_relacional>	::= "==" | "!=" | "<" | ">" ;
 
 <aritmetica>			::= <termo> <aritmetica_>  ;
-<aritmetica_>			::= Ã® | "+" <termo> <aritmetica_> | "-" <termo> <aritmetica_> ;
+<aritmetica_>			::= î | "+" <termo> #110 <aritmetica_> | "-" <termo> #111 <aritmetica_> ;
 
 <termo>			::= <fator> <termo_> ;
-<termo_>			::= Ã® | "*" <fator> <termo_> | "/" <fator> <termo_> ;
+<termo_>			::= î | "*" <fator> #112 <termo_> | "/" <fator> #113 <termo_> ;
 
-<fator>			::= identificador | 
-			    	    constante_int | 
-		   	    	    constante_float | 
-			    	    constante_string | 
+<fator>			::= identificador #131 | 
+			    	    constante_int #114 | 
+		   	    	    constante_float #115 | 
+			    	    constante_string #116 | 
 		   	    	    "(" <expressao> ")" |
 	    	  	    	    "+" <fator> | 
-	    		    	    "-" <fator> ;
+	    		    	    "-" <fator> #117;
