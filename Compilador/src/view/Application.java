@@ -42,8 +42,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -342,7 +344,7 @@ public class Application {
 	private void saveFile() {
 		File file = new File(this.lblStatus.getText());
 		textAreaMessages.setText("");
-		if (file.exists()) {
+		if (!this.lblStatus.getText().equals("novo")) {
 			this.updateFile(file.getAbsolutePath());
 		} else {
 			this.saveNewFile();
@@ -351,15 +353,23 @@ public class Application {
 
 	private void saveNewFile() {
 		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int result = fileChooser.showOpenDialog(frame);
 
 		if (result == JFileChooser.APPROVE_OPTION) {
-			String path = fileChooser.getSelectedFile().getAbsoluteFile().toString();
-			if (!path.endsWith(".txt")) {
-				path += ".txt";
+			File fileToSave = fileChooser.getSelectedFile();
+            try {
+				String path = fileToSave.getAbsolutePath();
+				if (!path.endsWith(".txt")) {
+					path += ".txt";
+				}
+				this.lblStatus.setText(path);
+				fileToSave = new File(path);
+                BufferedWriter writer = new BufferedWriter(new FileWriter(fileToSave));
+                writer.write(this.textAreaEditor.getText());
+                writer.close();
+			} catch (Exception e) {
+				System.out.println("Deu pau 2");
 			}
-			this.updateFile(path);
 		}
 	}
 
@@ -427,7 +437,9 @@ public class Application {
 				default: this.textAreaMessages.setText("Erro na linha " + this.getLine(this.textAreaEditor.getText(), sye.getPosition()) + " - encontrado " + sye.getToken().getLexeme() + " " + sye.getMessage());
 			}
 		} catch (SemanticError se) {
-		} 
+			this.textAreaMessages.setText("Erro na linha " + this.getLine(this.textAreaEditor.getText(), se.getPosition()) + " - " + se.getMessage());
+		}
+		this.saveIlasm();
 	}
 
 	private void lexicalError(LexicalError e) {
@@ -475,5 +487,14 @@ public class Application {
 			return new ImageIcon(resizedImage);
 		}
 		return icon;
+	}
+
+	private void saveIlasm() {
+		try {
+			Files.write(Paths.get(this.lblStatus.getText().replace(".txt", ".il")), Semantico.codigo.getBytes());
+			Semantico.codigo = "";
+		} catch (Exception e) {
+			System.out.println("Deu pau!");
+		}
 	}
 }

@@ -134,7 +134,7 @@ while= palavra_reservada: "while"
 
 <entrada> ::= in "(" <listin> ")";
 <listin> ::= constante_string #130 "," <aux3> | <aux3>;
-<aux3> ::= <listid> #139 <aux4>;
+<aux3> ::= <listid> #129 <aux4>;
 <aux4> ::= î | ";" <listin>;
 
 <saida> ::= out "(" <listexp> ")";

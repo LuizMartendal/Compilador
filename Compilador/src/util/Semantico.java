@@ -4,19 +4,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
+import view.Application;
+
 public class Semantico implements Constants {
 
     private HashMap<String, Simbolo> tabela_simbolos = new HashMap<>();
     private ArrayList<Token> list_id = new ArrayList<>(); 
 
     private Stack<String> pilha_tipos = new Stack<>();
+    private Stack<String> pilha_rotulos = new Stack<>();
     private String operadorRelacional;
-    private static String codigo = "";
+    public static String codigo = "";
+    private int rotulo = 0;
 
     public void executeAction(int action, Token token)	throws SemanticError
     {
-        System.out.println("Ação #"+action+", Token: "+token);
-
         switch (action) {
             case 100:
                 acao100();
@@ -93,6 +95,27 @@ public class Semantico implements Constants {
             case 129:
                 acao129(token);
                 break;
+            case 118:
+                acao118(token);
+                break;
+            case 120:
+                acao120();
+                break;
+            case 119:
+                acao119();
+                break;
+            case 121:
+                acao121();
+                break;
+            case 122:
+                acao122(token);
+                break;
+            case 123:
+                acao123();
+                break;
+            case 124:
+                acao124(token);
+                break;
         }
     }
 
@@ -109,7 +132,6 @@ public class Semantico implements Constants {
         codigo += "ret\n" +
                   "}\n" +
                   "}\n";
-        System.out.println(codigo);
     }
 
     public void acao131(Token token) throws SemanticError {
@@ -122,7 +144,7 @@ public class Semantico implements Constants {
             }
             return;
         }
-        throw new SemanticError(token.getLexeme() + " não declarado", token.getPosition());
+        throw new SemanticError(token.getLexeme() + " nao declarado", token.getPosition());
     }
 
     public void adicionaConstantePilha(Simbolo simbolo) {
@@ -295,7 +317,7 @@ public class Semantico implements Constants {
     public void acao126(Token token) throws SemanticError {
         for (Token t : this.list_id) {
             if (tabela_simbolos.containsKey(t.getLexeme())) {
-                throw new SemanticError(t.getLexeme() + " já declarado", t.getPosition());
+                throw new SemanticError(t.getLexeme() + " ja declarado", t.getPosition());
             }
             Simbolo simbolo = this.createSimbolo(t, token);
             tabela_simbolos.put(t.getLexeme(), simbolo);
@@ -323,12 +345,12 @@ public class Semantico implements Constants {
     public void acao127(Token token) throws SemanticError {
         for (Token t : this.list_id) {
             if (tabela_simbolos.containsKey(t.getLexeme())) {
-                throw new SemanticError(t.getLexeme() + " já declarado", t.getPosition());
+                throw new SemanticError(t.getLexeme() + " ja declarado", t.getPosition());
             }
             Simbolo simbolo = this.createSimbolo(t, token);
             simbolo.setConstante(false);
             tabela_simbolos.put(t.getLexeme(), simbolo);
-            codigo += ".locals " + simbolo.getTipo() + " " + simbolo.getIdentifidor() + "\n";
+            codigo += ".locals (" + simbolo.getTipo() + " " + simbolo.getIdentifidor() + ")\n";
         }
         this.list_id.clear();
     }
@@ -341,7 +363,7 @@ public class Semantico implements Constants {
 
         for (Token t : this.list_id) {
             if (!tabela_simbolos.containsKey(t.getLexeme())) {
-                throw new SemanticError(t.getLexeme() + " não declarado", t.getPosition());
+                throw new SemanticError(t.getLexeme() + " nao declarado", t.getPosition());
             }
             if (tipo.equals("int64")) {
                 codigo += "conv.i8\n";
@@ -359,7 +381,7 @@ public class Semantico implements Constants {
     public void acao129(Token token) throws SemanticError {
         for (Token t : this.list_id) {
             if (!tabela_simbolos.containsKey(t.getLexeme())) {
-                throw new SemanticError(t.getLexeme() + " não declarado", t.getPosition());
+                throw new SemanticError(t.getLexeme() + " nao declarado", t.getPosition());
             }
             this.input(tabela_simbolos.get(t.getLexeme()));
             codigo += "stloc " + t.getLexeme() + "\n";
@@ -383,5 +405,61 @@ public class Semantico implements Constants {
             default:
                 return "Double";
         }
+    }
+
+    public void acao118(Token token) throws SemanticError {
+        if (!pilha_tipos.pop().equals("bool")) {
+            throw new SemanticError("expressao incompativel em comando de selecao", token.getPosition());
+        }
+        String novoRotulo = this.criarNovoRotulo();
+        codigo += "brfalse " + novoRotulo + "\n";
+        pilha_rotulos.push(novoRotulo);
+    }
+
+    public String criarNovoRotulo() {
+        rotulo++;
+        String novoRotulo = "novo_rotulo" + rotulo;
+        return novoRotulo;
+    }
+
+    public void acao120() {
+        String novoRotulo = this.criarNovoRotulo();
+        codigo += "br " + novoRotulo + "\n";
+        codigo += "" + pilha_rotulos.pop() + ":\n";
+        pilha_rotulos.push(novoRotulo);
+    }
+
+    public void acao119() {
+        codigo += "" + pilha_rotulos.pop() + ":\n";
+    }
+
+    public void acao121() {
+        String novoRotulo = this.criarNovoRotulo();
+        codigo += "" + novoRotulo + ":\n";
+        pilha_rotulos.push(novoRotulo);
+    }
+
+    public void acao122(Token token) throws SemanticError {
+        if (!pilha_tipos.pop().equals("bool")) {
+            throw new SemanticError("expressao incompativel em comando de repeticao", token.getPosition());
+        }
+        String novoRotulo = this.criarNovoRotulo();
+        codigo += "brfalse " + novoRotulo + "\n";
+        pilha_rotulos.push(novoRotulo);
+    }
+
+    public void acao123() {
+        String rotulo2 = pilha_rotulos.pop();
+        String rotulo1 = pilha_rotulos.pop();
+        codigo += "br " + rotulo1 + "\n";
+        codigo += "" + rotulo2 + ":\n";
+    }
+
+    public void acao124(Token token) throws SemanticError {
+        if (!pilha_tipos.pop().equals("bool")) {
+            throw new SemanticError("expressao incompativel em comando de repeticao", token.getPosition());
+        }
+        String rotulo1 = pilha_rotulos.pop();
+        codigo += "brtrue " + rotulo1 + "\n";
     }
 }
